@@ -1,0 +1,12 @@
+add Wireless static ip address 
+# Add the network profile without connecting immediately
+sudo nmcli connection add type wifi ifname wlan0 con-name "brooker router" ssid "brooker router"
+sudo nmcli connection modify "brooker router" wifi-sec.key-mgmt wpa-psk
+sudo nmcli connection modify "brooker router" wifi-sec.psk "12345678"
+
+# Set auto-connect (will connect if available)
+sudo nmcli connection modify "brooker router" autoconnect yes
+sudo nmcli connection modify "brooker router" autoconnect-priority 5
+
+# Connect now
+sudo nmcli connection up "brooker router"

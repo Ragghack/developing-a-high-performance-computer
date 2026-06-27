@@ -1,0 +1,40 @@
+
+## start jupiter not book 
+jupyter-notebook --ip=0.0.0.0 --port=8888 --no-browser
+
+## start Vnc 
+vncserver :1 -geometry 1280x720 -depth 16 -localhost no
+
+## visualise mosquito to start brooker
+mosquitto_sub -h localhost -t "test" -v
+
+## test command 
+# 1. Kill everything using port 1883
+sudo fuser -k 1883/tcp 2>/dev/null
+sudo pkill -9 mosquitto 2>/dev/null
+sudo killall mosquitto 2>/dev/null
+
+# 2. Wait a moment
+sleep 2
+
+# 3. Verify port is free
+sudo netstat -tulpn | grep 1883 || echo "Port 1883 is free"
+
+# 4. Clean any stale lock files
+sudo rm -f /var/run/mosquitto.pid
+
+# 5. Start mosquitto
+sudo systemctl start mosquitto
+
+# 6. Check status
+sudo systemctl status mosquitto
+
+# 7. Test MQTT
+mosquitto_pub -h localhost -t "test" -m "Hello" && echo "MQTT Working!"
+mosquitto_sub -h localhost -t "test" -C 1 -W 2 
+
+# Start the service
+sudo systemctl start mosquitto
+
+# Check status - should show "active (running)"
+sudo systemctl status mosquitto

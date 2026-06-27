@@ -1,0 +1,31 @@
+test buzzer on the buzzer 
+# Terminal 1 — start daemon
+cd ~/edge_model
+export LD_PRELOAD=/home/david/.local/lib/python3.6/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
+python3 buzzer_daemon.py &
+
+# Wait for connection
+sleep 3
+
+# Test all 5 ascending patterns
+mosquitto_pub -h localhost -t "edge/alarm/test" -m "test"
+sleep 4
+
+# Test WARNING pattern (2 beeps every 10s)
+mosquitto_pub -h localhost -t "edge/predictions/esp32_01" \
+  -m '{"label":"WARNING","sensor_id":"esp32_01"}'
+sleep 12
+
+# Test ALARM pattern (3 rapid beeps every 3s)
+mosquitto_pub -h localhost -t "edge/predictions/esp32_01" \
+  -m '{"label":"ALARM","sensor_id":"esp32_01"}'
+sleep 10
+
+# Silence from dashboard
+mosquitto_pub -h localhost -t "edge/alarm/stop" -m "stop"
+echo "Alarm silenced"
+sleep 3
+
+kill %1
+
+
